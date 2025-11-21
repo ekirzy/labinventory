@@ -61,6 +61,16 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
 
         const { data: notifData } = await supabase.from('notifications').select('*').order('created_at', { ascending: false });
         if (notifData) setNotifications(notifData);
+
+        // Fetch User Profile
+        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', 'USER-001').single();
+        if (profileData) {
+          setUser({
+            name: profileData.name,
+            role: profileData.role,
+            avatar: profileData.avatar || ''
+          });
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -87,8 +97,12 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
     await supabase.from('logs').insert(newLog);
   };
 
-  const updateUserProfile = (updates: Partial<UserProfile>) => {
+  const updateUserProfile = async (updates: Partial<UserProfile>) => {
     setUser(prev => ({ ...prev, ...updates }));
+
+    // Save to Supabase
+    await supabase.from('profiles').update(updates).eq('id', 'USER-001');
+
     addLog('Profil pengguna diperbarui', 'edit');
   };
 
