@@ -28,8 +28,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const INITIAL_USER: UserProfile = {
-  name: 'Dr. Arini',
-  role: 'Kepala Laboratorium',
+  name: '',
+  role: '',
   avatar: ''
 };
 
