@@ -10,7 +10,7 @@ interface Props {
 }
 
 const LabFormModal = ({ isOpen, onClose, lab }: Props) => {
-  const { updateLab } = useApp();
+  const { updateLab, uploadImage } = useApp();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -70,8 +70,38 @@ const LabFormModal = ({ isOpen, onClose, lab }: Props) => {
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-gray-700">URL Gambar</span>
-              <input required value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} className="bg-white border border-gray-300 rounded-lg h-11 px-3 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none" placeholder="https://..." />
+              <span className="text-sm font-medium text-gray-700">Gambar Lab</span>
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const url = await uploadImage(file);
+                        setFormData({ ...formData, image: url });
+                      } catch (error) {
+                        alert('Gagal mengupload gambar');
+                        console.error(error);
+                      }
+                    }
+                  }}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-primary hover:file:bg-blue-100 transition-colors"
+                />
+              </div>
+              {formData.image && (
+                <div className="mt-2 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+                  <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, image: '' })}
+                    className="absolute top-2 right-2 bg-white/80 rounded-full p-1 text-red-500 hover:bg-white shadow-sm"
+                  >
+                    <span className="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              )}
             </label>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

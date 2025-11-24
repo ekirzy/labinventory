@@ -24,6 +24,7 @@ interface AppContextType {
   importItems: (items: Omit<InventoryItem, 'id'>[]) => Promise<void>;
   exportItems: () => void;
   exportLoans: () => void;
+  uploadImage: (file: File) => Promise<string>;
   loading: boolean;
 }
 
@@ -304,6 +305,23 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
     XLSX.writeFile(workbook, `Riwayat_Peminjaman_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+    return data.publicUrl;
+  };
+
   return (
     <AppContext.Provider value={{
       user, updateUserProfile,
@@ -311,7 +329,7 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
       addItem, updateItem, deleteItem,
       borrowItem, markLoanReturned, deleteLoan,
       reportDamage, completeMaintenance,
-      updateLab, importItems, exportItems, exportLoans,
+      updateLab, importItems, exportItems, exportLoans, uploadImage,
       loading
     }}>
       {children}
