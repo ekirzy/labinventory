@@ -5,7 +5,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import RecordLoanModal from '../components/RecordLoanModal';
 
 const Loans = () => {
-    const { loans, markLoanReturned, deleteLoan } = useApp();
+    const { loans, markLoanReturned, deleteLoan, exportLoans } = useApp();
     const [loanToDelete, setLoanToDelete] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
@@ -83,6 +83,13 @@ const Loans = () => {
                     <p className="text-gray-500 text-sm md:text-base font-normal">Lacak peralatan dan material yang dipinjam.</p>
                 </div>
                 <div className="flex items-center gap-4 w-full md:w-auto">
+                    <button
+                        onClick={exportLoans}
+                        className="flex w-full md:w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 gap-2 text-sm font-bold px-4 transition-colors shadow-sm"
+                    >
+                        <span className="material-symbols-outlined text-lg font-bold">download</span>
+                        <span className="truncate">Ekspor Excel</span>
+                    </button>
                     <button
                         onClick={() => setIsRecordModalOpen(true)}
                         className="flex w-full md:min-w-[84px] md:max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold hover:bg-primary-hover transition-colors shadow-sm shadow-blue-500/20"
@@ -219,8 +226,8 @@ const Loans = () => {
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${loan.status === 'Dikembalikan' ? 'bg-green-100 text-green-800' :
-                                                isOverdue ? 'bg-red-100 text-red-800' :
-                                                    'bg-yellow-100 text-yellow-800'
+                                            isOverdue ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
                                             }`}>
                                             {isOverdue ? 'Terlambat' : loan.status}
                                         </span>

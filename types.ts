@@ -61,6 +61,9 @@ export interface Lab {
   location: string;
   description: string;
   image: string;
+  manager?: string;
+  capacity?: number;
+  safetyLevel?: 'Rendah' | 'Sedang' | 'Tinggi';
 }
 
 export interface UserProfile {

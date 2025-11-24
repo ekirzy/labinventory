@@ -21,7 +21,9 @@ interface AppContextType {
   reportDamage: (id: string, description: string) => void;
   completeMaintenance: (id: string) => void;
   updateLab: (id: string, updates: Partial<Lab>) => void;
-  exportData: () => void;
+  importItems: (items: Omit<InventoryItem, 'id'>[]) => Promise<void>;
+  exportItems: () => void;
+  exportLoans: () => void;
   loading: boolean;
 }
 
@@ -230,32 +232,76 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
     addLog(`Detail Lab diperbarui: ${id}`, 'edit');
   };
 
-  const exportData = () => {
-    const header = ['Nama Item', 'Kategori', 'Kuantitas', 'Satuan', 'Status', 'Nama Lab', 'Lokasi', 'Tanggal Perolehan'];
-    const rows = items.map(item => {
+  const importItems = async (newItems: Omit<InventoryItem, 'id'>[]) => {
+    const itemsToInsert = newItems.map(item => ({
+      ...item,
+      id: `ITEM-${Math.floor(Math.random() * 1000000)}`,
+      status: item.quantity === 0 ? ItemStatus.OUT_OF_STOCK : (item.quantity < 5 ? ItemStatus.LOW_STOCK : ItemStatus.AVAILABLE)
+    }));
+
+    setItems(prev => [...itemsToInsert, ...prev]); // Optimistic update
+
+    const { error } = await supabase.from('items').insert(itemsToInsert);
+
+    if (error) {
+      console.error('Error importing items:', error);
+      // Revert optimistic update if needed, or handle error
+      throw new Error('Gagal menyimpan data ke database.');
+    }
+
+    addLog(`Import massal ${itemsToInsert.length} item`, 'add');
+  };
+
+  const exportItems = async () => {
+    // Dynamic import to avoid SSR issues if any, though we are client side
+    const XLSX = await import('xlsx');
+
+    const data = items.map(item => {
       const lab = labs.find(l => l.id === item.labId);
-      return [
-        `"${item.name.replace(/"/g, '""')}"`,
-        item.category,
-        item.quantity,
-        item.unit,
-        item.status,
-        `"${(lab ? lab.name : 'Lab Tidak Diketahui').replace(/"/g, '""')}"`,
-        `"${item.location.replace(/"/g, '""')}"`,
-        item.acquisitionDate || ''
-      ].join(',');
+      return {
+        'Nama Item': item.name,
+        'Kategori': item.category,
+        'Jumlah': item.quantity,
+        'Satuan': item.unit,
+        'Status': item.status,
+        'Laboratorium': lab ? lab.name : 'Unknown',
+        'Lokasi': item.location,
+        'Tanggal Perolehan': item.acquisitionDate || '',
+        'Deskripsi': item.description || '',
+        'Serial Number': item.serialNumber || ''
+      };
     });
 
-    const csvContent = [header.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `ekspor_inventaris_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventaris");
+
+    // Auto-width columns
+    const max_width = data.reduce((w, r) => Math.max(w, r['Nama Item'].length), 10);
+    worksheet['!cols'] = [{ wch: max_width }];
+
+    XLSX.writeFile(workbook, `Inventaris_Lab_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const exportLoans = async () => {
+    const XLSX = await import('xlsx');
+
+    const data = loans.map(loan => ({
+      'ID Peminjaman': loan.id,
+      'Nama Item': loan.itemName,
+      'Peminjam': loan.borrower,
+      'ID Peminjam': loan.borrowerId,
+      'Tanggal Pinjam': loan.borrowDate,
+      'Jatuh Tempo': loan.dueDate,
+      'Tanggal Kembali': loan.returnDate || '-',
+      'Status': loan.status,
+      'Jumlah Dipinjam': loan.quantityBorrowed
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat Peminjaman");
+    XLSX.writeFile(workbook, `Riwayat_Peminjaman_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   return (
@@ -265,7 +311,7 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
       addItem, updateItem, deleteItem,
       borrowItem, markLoanReturned, deleteLoan,
       reportDamage, completeMaintenance,
-      updateLab, exportData,
+      updateLab, importItems, exportItems, exportLoans,
       loading
     }}>
       {children}

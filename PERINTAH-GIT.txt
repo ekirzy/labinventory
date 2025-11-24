@@ -1,0 +1,127 @@
+================================================================================
+  PERINTAH GIT & DEPLOY - Lab Inventory Pro
+================================================================================
+
+LANGKAH 1: SETUP GIT (Hanya sekali di awal)
+--------------------------------------------------------------------------------
+cd e:\labinventory-pro
+git init
+git branch -M main
+git config --global user.name "Nama Anda"
+git config --global user.email "email@example.com"
+
+
+LANGKAH 2: COMMIT PERTAMA
+--------------------------------------------------------------------------------
+git add .
+git status
+git commit -m "Initial commit: Lab Inventory Pro application"
+
+
+LANGKAH 3: HUBUNGKAN KE GITHUB
+--------------------------------------------------------------------------------
+# Ganti URL dengan URL repository GitHub Anda!
+git remote add origin https://github.com/username/labinventory-pro.git
+git remote -v
+
+
+LANGKAH 4: PUSH KE GITHUB
+--------------------------------------------------------------------------------
+git push -u origin main
+
+# Jika diminta login:
+# Username: username GitHub Anda
+# Password: Personal Access Token (BUKAN password GitHub biasa!)
+
+
+LANGKAH 5: UPDATE SELANJUTNYA (setelah edit code)
+--------------------------------------------------------------------------------
+git add .
+git commit -m "Update: deskripsi perubahan Anda"
+git push
+
+
+================================================================================
+  FILE YANG AKAN DI-UPLOAD KE GITHUB
+================================================================================
+
+✅ AKAN DI-UPLOAD:
+  - Semua file .tsx, .ts, .json
+  - index.html
+  - netlify.toml
+  - package.json
+  - README.md
+  - DEPLOYMENT.md
+  - Folder: components/, pages/, context/
+
+❌ TIDAK DI-UPLOAD (otomatis diabaikan):
+  - node_modules/
+  - dist/
+  - .env.local
+  - *.log
+
+
+================================================================================
+  CARA MEMBUAT PERSONAL ACCESS TOKEN (untuk git push)
+================================================================================
+
+1. Buka GitHub → klik foto profil → Settings
+2. Scroll ke bawah → Developer settings
+3. Personal access tokens → Tokens (classic)
+4. Generate new token (classic)
+5. Note: "Netlify Deploy"
+6. Expiration: 90 days (atau No expiration)
+7. Centang scope: ✅ repo (semua sub-checkbox)
+8. Generate token
+9. COPY TOKEN (hanya muncul sekali!)
+10. Paste sebagai password saat git push
+
+
+================================================================================
+  DEPLOY KE NETLIFY (setelah push ke GitHub)
+================================================================================
+
+1. Buka https://www.netlify.com/
+2. Login dengan GitHub
+3. Add new site → Import an existing project
+4. Deploy with GitHub
+5. Pilih repository: labinventory-pro
+6. Build settings (otomatis terdeteksi):
+   - Build command: npm run build
+   - Publish directory: dist
+7. Deploy site
+8. Tunggu 1-3 menit
+9. Klik link untuk lihat website Anda!
+
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+Error: "fatal: not a git repository"
+→ Jalankan: git init
+
+Error: "failed to push"
+→ Jalankan: git pull origin main --allow-unrelated-histories
+→ Lalu: git push -u origin main
+
+Error: "Support for password authentication was removed"
+→ Gunakan Personal Access Token, bukan password
+
+Build failed di Netlify
+→ Test di lokal: npm install && npm run build
+→ Fix error, lalu commit dan push lagi
+
+
+================================================================================
+  KONTAK & BANTUAN
+================================================================================
+
+GitHub Docs: https://docs.github.com/
+Netlify Docs: https://docs.netlify.com/
+Netlify Community: https://answers.netlify.com/
+
+
+================================================================================
+Selamat mencoba! 🚀
+================================================================================
