@@ -1,4 +1,3 @@
-```
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Link } from 'react-router-dom';
@@ -8,7 +7,7 @@ import ImportExcelModal from '../components/ImportExcelModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 
 const Inventory = () => {
-    const { items, deleteItem, labs, exportData } = useApp();
+    const { items, deleteItem, labs, exportItems } = useApp();
     const [search, setSearch] = useState('');
     const [activeLabId, setActiveLabId] = useState<string>(labs[0]?.id || '');
 
@@ -91,7 +90,7 @@ const Inventory = () => {
                         <button
                             key={lab.id}
                             onClick={() => setActiveLabId(lab.id)}
-                            className={`px - 4 py - 3 text - sm font - medium whitespace - nowrap rounded - t - lg transition - all border - b - 2 ${ activeLabId === lab.id ? 'border-primary text-primary bg-blue-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50' } `}
+                            className={`px-4 py-3 text-sm font-medium whitespace-nowrap rounded-t-lg transition-all border-b-2 ${activeLabId === lab.id ? 'border-primary text-primary bg-blue-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
                         >
                             {lab.name}
                         </button>
@@ -123,7 +122,7 @@ const Inventory = () => {
                         <div className="relative w-full md:w-auto" ref={categoryRef}>
                             <button
                                 onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                                className={`flex w - full md: min - w - [140px] cursor - pointer items - center justify - between overflow - hidden rounded - lg h - 10 px - 3 border text - sm font - medium gap - 2 transition - colors ${ selectedCategory !== 'Semua' ? 'bg-blue-50 border-blue-200 text-primary' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50' } `}
+                                className={`flex w - full md: min - w - [140px] cursor - pointer items - center justify - between overflow - hidden rounded - lg h - 10 px - 3 border text - sm font - medium gap - 2 transition - colors ${selectedCategory !== 'Semua' ? 'bg-blue-50 border-blue-200 text-primary' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'} `}
                             >
                                 <div className="flex items-center gap-2 truncate">
                                     <span className="material-symbols-outlined text-base">filter_list</span>
@@ -137,7 +136,7 @@ const Inventory = () => {
                                     <div className="py-1">
                                         <button
                                             onClick={() => { setSelectedCategory('Semua'); setShowCategoryDropdown(false); }}
-                                            className={`block w - full text - left px - 4 py - 2 text - sm ${ selectedCategory === 'Semua' ? 'bg-blue-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50' } `}
+                                            className={`block w - full text - left px - 4 py - 2 text - sm ${selectedCategory === 'Semua' ? 'bg-blue-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50'} `}
                                         >
                                             Semua Kategori
                                         </button>
@@ -145,7 +144,7 @@ const Inventory = () => {
                                             <button
                                                 key={category}
                                                 onClick={() => { setSelectedCategory(category); setShowCategoryDropdown(false); }}
-                                                className={`block w - full text - left px - 4 py - 2 text - sm ${ selectedCategory === category ? 'bg-blue-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50' } `}
+                                                className={`block w - full text - left px - 4 py - 2 text - sm ${selectedCategory === category ? 'bg-blue-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50'} `}
                                             >
                                                 {category}
                                             </button>
@@ -203,7 +202,7 @@ const Inventory = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900">
-                                        <Link to={`/ item / ${ item.id } `} className="hover:text-primary hover:underline">{item.name}</Link>
+                                        <Link to={`/ item / ${item.id} `} className="hover:text-primary hover:underline">{item.name}</Link>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded border border-gray-200">{item.category}</span>
